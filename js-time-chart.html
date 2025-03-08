@@ -245,7 +245,7 @@
                             ticks: {
                                 callback: function(value) {
 //                                    return value.toFixed(2) + 's';
-                                      return formatTime(Math.floor(value * 100)) + '';
+                                      return formatTime(Math.round(value * 100)) + '';
                                 }
                             }
                         },
