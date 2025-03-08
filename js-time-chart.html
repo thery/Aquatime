@@ -49,8 +49,8 @@
         //const encodedData = "a%3A13%3A%7Bi%3A0%3Ba%3A3%3A%7Bi%3A0%3BN%3Bi%3A1%3Bs%3A1%3A%220%22%3Bi%3A2%3BN%3B%7Di%3A1%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2224%2F03%2F2024%22%3Bi%3A1%3Bi%3A1%3Bi%3A2%3Bi%3A2398%3B%7Di%3A2%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2209%2F04%2F2024%22%3Bi%3A1%3Bi%3A2%3Bi%3A2%3Bi%3A2382%3B%7Di%3A3%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2220%2F10%2F2024%22%3Bi%3A1%3Bi%3A3%3Bi%3A2%3Bi%3A2349%3B%7Di%3A4%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2209%2F11%2F2024%22%3Bi%3A1%3Bi%3A4%3Bi%3A2%3Bi%3A2383%3B%7Di%3A5%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2209%2F11%2F2024%22%3Bi%3A1%3Bi%3A5%3Bi%3A2%3Bi%3A2386%3B%7Di%3A6%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2230%2F11%2F2024%22%3Bi%3A1%3Bi%3A6%3Bi%3A2%3Bi%3A2354%3B%7Di%3A7%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2201%2F12%2F2024%22%3Bi%3A1%3Bi%3A7%3Bi%3A2%3Bi%3A2361%3B%7Di%3A8%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2212%2F01%2F2025%22%3Bi%3A1%3Bi%3A8%3Bi%3A2%3Bi%3A2346%3B%7Di%3A9%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2201%2F02%2F2025%22%3Bi%3A1%3Bi%3A9%3Bi%3A2%3Bi%3A2333%3B%7Di%3A10%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2223%2F02%2F2025%22%3Bi%3A1%3Bi%3A10%3Bi%3A2%3Bi%3A2462%3B%7Di%3A11%3Ba%3A3%3A%7Bi%3A0%3Bs%3A10%3A%2202%2F03%2F2025%22%3Bi%3A1%3Bi%3A11%3Bi%3A2%3Bi%3A2353%3B%7Di%3A12%3Ba%3A3%3A%7Bi%3A0%3BN%3Bi%3A1%3Bi%3A12%3Bi%3A2%3BN%3B%7D%7D";
         const encodedData = urlParams.get('data');
         const encodedNome = urlParams.get('TGNome');
-        console.log(encodedData);
-        console.log(encodedNome);
+        // console.log(encodedData);
+        // console.log(encodedNome);
         const h2 = document.querySelector("h2");
         h2.innerText = encodedNome;
         const title = document.querySelector("title");
@@ -101,7 +101,7 @@
                 if (match[4].startsWith('i:')) {
                     timeValue = parseInt(match[4].match(/i:(\d+)/)[1]);
                 }
-                console.log(timeValue);
+                // console.log(timeValue);
                 // Add to result array if we have valid data
                 result[index] = [date, position, timeValue];
             }
@@ -186,8 +186,8 @@
             // Find min and max values for styling
             const minTime = Math.min(...data);
             const maxTime = Math.max(...data);
-            console.log ('minTime ' + minTime);
-            console.log ('maxTime ' + maxTime);
+            // console.log ('minTime ' + minTime);
+            // console.log ('maxTime ' + maxTime);
             
             
             // Round min and max for y-axis scaling with some padding
@@ -245,7 +245,7 @@
                             ticks: {
                                 callback: function(value) {
 //                                    return value.toFixed(2) + 's';
-                                      return formatTime(value * 100) + '';
+                                      return formatTime(Math.floor(value * 100)) + '';
                                 }
                             }
                         },
