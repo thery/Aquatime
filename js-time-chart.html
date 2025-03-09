@@ -210,6 +210,7 @@
                         pointBackgroundColor: function(context) {
                             const index = context.dataIndex;
                             const value = context.dataset.data[index];
+                            if (Math.abs(value - minTime) < 0.001) return 'rgba(54, 235, 126, 1)';
                             return 'rgba(54, 162, 235, 1)';
                         },
                         pointHoverRadius: 8,
