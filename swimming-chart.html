@@ -37,8 +37,8 @@
   <h1>Swimming Race Data Visualization</h1>
   
   <div class="tabs">
-    <div class="tab active" onclick="showChart('cumulativeTimes')">cumulativeTimes</div>
-    <div class="tab" onclick="showChart('progressione')">Progressione</div>
+    <div class="tab active" onclick="showChart('splitTimes')">Intermedi</div>
+    <div class="tab" onclick="showChart('cumulativeTimes')">Cumulativi</div>
     <div class="tab" onclick="showChart('splitPace')">Split Pace</div>
   </div>
   
@@ -305,7 +305,7 @@
     }
 
     const processedData = processData();
-    let chartType = 'cumulativeTimess'; // Default chart type
+    let chartType = 'splitTimess'; // Default chart type
     let chartInstance = null;
 
     // Colors for the swimmers
@@ -323,7 +323,7 @@
       let chartTitle = '';
       let yAxisLabel = '';
       
-      if (chartType === 'cumulativeTimes') {
+      if (chartType === 'splitTimes') {
         chartTitle = 'Intermeti';
         yAxisLabel = 'Tempi';
         
@@ -337,7 +337,7 @@
             tension: 0.1
           });
         }
-      } else if (chartType === 'progressione') {
+      } else if (chartType === 'cumulativeTimes') {
         chartTitle = 'Cumulative Race Times';
         yAxisLabel = 'Time (seconds)';
         
