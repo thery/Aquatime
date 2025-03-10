@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Swimming Race Data Chart</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .chart-container {
+      width: 80%;
+      margin: 0 auto;
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #f0f0f0;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+    }
+    .tab.active {
+      background-color: #007bff;
+      color: white;
+    }
+    h1 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Swimming Race Data Visualization</h1>
+  
+  <div class="tabs">
+    <div class="tab active" onclick="showChart('cumulativeTimes')">cumulativeTimes</div>
+    <div class="tab" onclick="showChart('progressione')">Progressione</div>
+    <div class="tab" onclick="showChart('splitPace')">Split Pace</div>
+  </div>
+  
+  <div class="chart-container">
+    <canvas id="raceChart"></canvas>
+  </div>
+
+  <script>
+    var HtmlEntities = function() {};
+    HtmlEntities.map = {
+        "'": "&apos;",
+        "´": "&acute;",
+        "À": "&Agrave;",
+        "Á": "&Aacute;",
+        "Â": "&Acirc;",
+        "Ã": "&Atilde;",
+        "Ä": "&Auml;",
+        "Å": "&Aring;",
+        "Æ": "&AElig;",
+        "Ç": "&Ccedil;",
+        "È": "&Egrave;",
+        "É": "&Eacute;",
+        "Ê": "&Ecirc;",
+        "Ë": "&Euml;",
+        "Ì": "&Igrave;",
+        "Í": "&Iacute;",
+        "Î": "&Icirc;",
+        "Ï": "&Iuml;",
+        "Ð": "&ETH;",
+        "Ñ": "&Ntilde;",
+        "Ò": "&Ograve;",
+        "Ó": "&Oacute;",
+        "Ô": "&Ocirc;",
+        "Õ": "&Otilde;",
+        "Ö": "&Ouml;",
+        "×": "&times;",
+        "Ø": "&Oslash;",
+        "Ù": "&Ugrave;",
+        "Ú": "&Uacute;",
+        "Û": "&Ucirc;",
+        "Ü": "&Uuml;",
+        "Ý": "&Yacute;",
+        "Þ": "&THORN;",
+        "ß": "&szlig;",
+        "à": "&agrave;",
+        "á": "&aacute;",
+        "â": "&acirc;",
+        "ã": "&atilde;",
+        "ä": "&auml;",
+        "å": "&aring;",
+        "æ": "&aelig;",
+        "ç": "&ccedil;",
+        "è": "&egrave;",
+        "é": "&eacute;",
+        "ê": "&ecirc;",
+        "ë": "&euml;",
+        "ì": "&igrave;",
+        "í": "&iacute;",
+        "î": "&icirc;",
+        "ï": "&iuml;",
+        "ð": "&eth;",
+        "ñ": "&ntilde;",
+        "ò": "&ograve;",
+        "ó": "&oacute;",
+        "ô": "&ocirc;",
+        "õ": "&otilde;",
+        "ö": "&ouml;",
+        "÷": "&divide;",
+        "ø": "&oslash;",
+        "ù": "&ugrave;",
+        "ú": "&uacute;",
+        "û": "&ucirc;",
+        "ü": "&uuml;",
+        "ý": "&yacute;",
+    };
+
+    HtmlEntities.decode = function(string) {
+        var entityMap = HtmlEntities.map;
+        for (var key in entityMap){
+            var entity = entityMap[key];
+            var regex = new RegExp(entity, 'g');
+            string = string.replace(regex, key);
+        }
+        string = string.replace(/&quot;/g, '"');
+        string = string.replace(/&amp;/g, '&');
+        return string;
+    }
+
+    function phpUnserialize(serializedString) {
+      // First, decode URL-encoded characters
+      const urlDecoded = decodeURIComponent(serializedString);
+      
+      let index = 0;
+      
+      function readUntil(char) {
+        let result = '';
+        while (index < urlDecoded.length && urlDecoded[index] !== char) {
+          result += urlDecoded[index];
+          index++;
+        }
+        index++; // Skip the delimiter
+        return result;
+      }
+      
+      function parseValue() {
+        if (index >= urlDecoded.length) {
+          return null;
+        }
+        
+        const type = urlDecoded[index];
+        index++; // Move past the type indicator
+        
+        switch (type) {
+          case 'N': // NULL
+            index++; // Skip the semicolon
+            return null;
+            
+          case 'b': // Boolean
+            const boolValue = urlDecoded[index] === '1';
+            index += 2; // Skip the value and semicolon
+            return boolValue;
+            
+          case 'i': // Integer
+            index++; // Skip the colon
+            const intStr = readUntil(';');
+            return parseInt(intStr, 10);
+            
+          case 'd': // Float/Double
+            index++; // Skip the colon
+            const floatStr = readUntil(';');
+            return parseFloat(floatStr);
+            
+          case 's': // String
+            index++; // Skip the colon
+            const length = parseInt(readUntil(':'), 10);
+            index++; // Skip the quote
+            const str = urlDecoded.substr(index, length);
+            index += length + 2; // Skip string and quotes
+            return str;
+            
+          case 'a': // Array (associative or indexed)
+            index++; // Skip the colon
+            const count = parseInt(readUntil(':'), 10);
+            index++; // Skip the opening brace
+            
+            const result = [];
+            const isAssoc = {};
+            
+            for (let i = 0; i < count; i++) {
+              const key = parseValue();
+              const val = parseValue();
+              
+              result[key] = val;
+              
+              // Check if this is an associative array
+              if (typeof key === 'string' || key !== i) {
+                isAssoc[key] = true;
+              }
+            }
+            
+            index++; // Skip the closing brace
+            
+            // Convert to object if it's an associative array
+            if (Object.keys(isAssoc).length > 0) {
+              const obj = {};
+              for (const key in result) {
+                obj[key] = result[key];
+              }
+              return obj;
+            }
+            
+            return result;
+            
+          default:
+            throw new Error(`Unsupported type: ${type}`);
+        }
+      }
+      
+      return parseValue();
+    }
+
+    // Parse the data from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedData = "a%3A4%3A%7Bi%3A0%3Ba%3A6%3A%7Bi%3A0%3Bs%3A3%3A%2250m%22%3Bi%3A1%3Bs%3A2%3A%2250%22%3Bi%3A2%3Bd%3A25.96%3Bi%3A3%3Bd%3A26.6%3Bi%3A4%3Bd%3A25.89%3Bi%3A5%3Bd%3A27.39%3B%7Di%3A1%3Ba%3A6%3A%7Bi%3A0%3Bs%3A4%3A%22100m%22%3Bi%3A1%3Bs%3A3%3A%22100%22%3Bi%3A2%3Bd%3A27.7%3Bi%3A3%3Bd%3A29.1%3Bi%3A4%3Bd%3A29.26%3Bi%3A5%3Bd%3A29.79%3B%7Di%3A2%3Ba%3A6%3A%7Bi%3A0%3Bs%3A4%3A%22150m%22%3Bi%3A1%3Bs%3A3%3A%22150%22%3Bi%3A2%3Bd%3A28.9%3Bi%3A3%3Bd%3A29.43%3Bi%3A4%3Bd%3A30.57%3Bi%3A5%3Bd%3A30.68%3B%7Di%3A3%3Ba%3A6%3A%7Bi%3A0%3Bs%3A4%3A%22200m%22%3Bi%3A1%3Bs%3A3%3A%22200%22%3Bi%3A2%3Bi%3A30%3Bi%3A3%3Bd%3A29.77%3Bi%3A4%3Bd%3A30.61%3Bi%3A5%3Bd%3A30.59%3B%7D%7D";
+    const encodedData2 = "a%3A5%3A%7Bi%3A0%3Ba%3A10%3A%7Bi%3A0%3BN%3Bi%3A1%3Bi%3A0%3Bi%3A2%3Bi%3A0%3Bi%3A3%3Bi%3A0%3Bi%3A4%3Bi%3A0%3Bi%3A5%3Bi%3A0%3Bi%3A6%3Bi%3A0%3Bi%3A7%3Bi%3A0%3Bi%3A8%3Bi%3A0%3Bi%3A9%3Bi%3A0%3B%7Di%3A1%3Ba%3A6%3A%7Bi%3A0%3Bs%3A3%3A%2250m%22%3Bi%3A1%3Bs%3A2%3A%2250%22%3Bi%3A2%3Bi%3A2596%3Bi%3A3%3Bi%3A2660%3Bi%3A4%3Bi%3A2589%3Bi%3A5%3Bi%3A2739%3B%7Di%3A2%3Ba%3A6%3A%7Bi%3A0%3Bs%3A4%3A%22100m%22%3Bi%3A1%3Bs%3A3%3A%22100%22%3Bi%3A2%3Bi%3A5366%3Bi%3A3%3Bi%3A5570%3Bi%3A4%3Bi%3A5515%3Bi%3A5%3Bi%3A5718%3B%7Di%3A3%3Ba%3A6%3A%7Bi%3A0%3Bs%3A4%3A%22150m%22%3Bi%3A1%3Bs%3A3%3A%22150%22%3Bi%3A2%3Bi%3A8256%3Bi%3A3%3Bi%3A8513%3Bi%3A4%3Bi%3A8572%3Bi%3A5%3Bi%3A8786%3B%7Di%3A4%3Ba%3A6%3A%7Bi%3A0%3Bs%3A4%3A%22200m%22%3Bi%3A1%3Bs%3A3%3A%22200%22%3Bi%3A2%3Bi%3A11256%3Bi%3A3%3Bi%3A11490%3Bi%3A4%3Bi%3A11633%3Bi%3A5%3Bi%3A11845%3B%7D%7D";
+    const encodedLegend = "a%3A4%3A%7Bi%3A0%3Bs%3A12%3A%22Thery+Jeremy%22%3Bi%3A1%3Bs%3A24%3A%22D%26acute%3BAdamo+Alessandro%22%3Bi%3A2%3Bs%3A16%3A%22Righetti+Lorenzo%22%3Bi%3A3%3Bs%3A12%3A%22Ferri+Mattia%22%3B%7D";
+
+    // Decode the data
+   //const data = phpDeserialize(decodeURIComponent(encodedData));
+    
+    const data = phpUnserialize(encodedData);
+    console.log(data);
+    //const data2 = phpDeserialize(decodeURIComponent(encodedData2));
+    const data2 = phpUnserialize(encodedData2);
+    console.log(data2);
+    
+    const legend = phpUnserialize(encodedLegend.replace(/\+/g, " "));
+
+    // Fix D'Adamo name
+    if (legend[1]) {
+      legend[1] = HtmlEntities.decode(legend[1]);
+    }
+
+    // Process the data for Chart.js
+    function processData() {
+      const distances = [];
+      const swimmers = {};
+      const cumulativeSwimmers = {};
+      const splitPace = {};
+      
+      // Initialize swimmer data arrays
+      for (let i = 0; i < Object.keys(legend).length; i++) {
+        swimmers[i] = [];
+        cumulativeSwimmers[i] = [];
+        splitPace[i] = [];
+      }
+
+      // Process the split times (data)
+      for (let i = 0; i < Object.keys(data).length; i++) {
+        const entry = data[i];
+        const distance = entry[0];
+        distances.push(distance);
+        
+        // Add data for each swimmer
+        for (let j = 0; j < Object.keys(legend).length; j++) {
+          const time = entry[j + 2]; // +2 because indexes 0 and 1 are for distance info
+          swimmers[j].push(time);
+          
+          // Calculate pace per 100m
+          const distanceValue = parseInt(entry[1]);
+          const prevDistance = i > 0 ? parseInt(data[i-1][1]) : 0;
+          const segmentDistance = distanceValue - prevDistance;
+          
+          if (i > 0) {
+            const prevTime = swimmers[j][i-1];
+            const segmentTime = time - prevTime;
+            const pace = (segmentTime / segmentDistance) * 100;
+            splitPace[j].push(pace);
+          } else {
+            const pace = (time / distanceValue) * 100;
+            splitPace[j].push(pace);
+          }
+        }
+      }
+
+      // Process the cumulative times (data2)
+      // Skip the first entry of data2 which appears to be metadata
+      for (let i = 1; i < Object.keys(data2).length; i++) {
+        const entry = data2[i];
+        
+        // Add data for each swimmer
+        for (let j = 0; j < Object.keys(legend).length; j++) {
+          const time = entry[j + 2] / 100; // Convert to seconds
+          cumulativeSwimmers[j].push(time);
+        }
+      }
+
+      return {
+        distances,
+        swimmers,
+        cumulativeSwimmers,
+        splitPace
+      };
+    }
+
+    const processedData = processData();
+    let chartType = 'cumulativeTimess'; // Default chart type
+    let chartInstance = null;
+
+    // Colors for the swimmers
+    const colors = [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 206, 86)',
+      'rgb(75, 192, 192)'
+    ];
+
+    function createChart() {
+      const ctx = document.getElementById('raceChart').getContext('2d');
+      
+      let datasets = [];
+      let chartTitle = '';
+      let yAxisLabel = '';
+      
+      if (chartType === 'cumulativeTimes') {
+        chartTitle = 'Intermeti';
+        yAxisLabel = 'Tempi';
+        
+        for (let i = 0; i < Object.keys(legend).length; i++) {
+          datasets.push({
+            label: legend[i],
+            data: processedData.swimmers[i],
+            borderColor: colors[i],
+            backgroundColor: colors[i] + '33', // Add transparency
+            fill: false,
+            tension: 0.1
+          });
+        }
+      } else if (chartType === 'progressione') {
+        chartTitle = 'Cumulative Race Times';
+        yAxisLabel = 'Time (seconds)';
+        
+        for (let i = 0; i < Object.keys(legend).length; i++) {
+          datasets.push({
+            label: legend[i],
+            data: processedData.cumulativeSwimmers[i],
+            borderColor: colors[i],
+            backgroundColor: colors[i] + '33', // Add transparency
+            fill: false,
+            tension: 0.1
+          });
+        }
+      } else if (chartType === 'splitPace') {
+        chartTitle = 'Pace per 100m';
+        yAxisLabel = 'Time (seconds per 100m)';
+        
+        for (let i = 0; i < Object.keys(legend).length; i++) {
+          datasets.push({
+            label: legend[i],
+            data: processedData.splitPace[i],
+            borderColor: colors[i],
+            backgroundColor: colors[i] + '33', // Add transparency
+            fill: false,
+            tension: 0.1
+          });
+        }
+      }
+      
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+      
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: processedData.distances,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: chartTitle,
+              font: {
+                size: 18
+              }
+            },
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += context.parsed.y.toFixed(2) + ' seconds';
+                  }
+                  return label;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Distance'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: yAxisLabel
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function showChart(type) {
+      chartType = type;
+      
+      // Update active tab
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      document.querySelector(`.tab[onclick="showChart('${type}')"]`).classList.add('active');
+      
+      createChart();
+    }
+
+    // Initialize the first chart
+    createChart();
+  </script>
+</body>
+</html>
