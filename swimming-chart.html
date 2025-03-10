@@ -329,6 +329,14 @@
       colors.push('rgb(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ')');
     }
 
+    function formatTime(hundredths) {
+        const totalSeconds = hundredths / 100;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+        const remainingHundredths = hundredths % 100;
+        
+        return `${minutes.toString().padStart(2, '0')}'${seconds.toString().padStart(2, '0')}''${remainingHundredths.toString().padStart(2, '0')}`;
+    }
     function createChart() {
       const ctx = document.getElementById('raceChart').getContext('2d');
       
@@ -397,7 +405,7 @@
                     label += ': ';
                   }
                   if (context.parsed.y !== null) {
-                    label += context.parsed.y.toFixed(2) + ' secondi';
+                    label += formatTime(Math.round(context.parsed.y * 100)) + '';
                   }
                   return label;
                 }
@@ -408,13 +416,18 @@
             x: {
               title: {
                 display: true,
-                text: 'Distance'
+                text: 'Distanza'
               }
             },
             y: {
               title: {
                 display: true,
                 text: yAxisLabel
+              },
+              ticks: {
+                  callback: function(value) {
+                        return formatTime(Math.round(value * 100)) + '';
+                  }
               }
             }
           }
