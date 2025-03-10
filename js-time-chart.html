@@ -210,7 +210,7 @@
                         pointBackgroundColor: function(context) {
                             const index = context.dataIndex;
                             const value = context.dataset.data[index];
-                            if (Math.abs(value - minTime) < 0.001) return 'rgba(54, 235, 126, 1)';
+                            if (Math.abs(value - minTime) < 0.001) return 'rgba(255, 255, 0, 1)';
                             return 'rgba(54, 162, 235, 1)';
                         },
                         pointHoverRadius: 8,
@@ -224,7 +224,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return 'Time: ' + tooltips[context.dataIndex];
+                                    return 'Tempo: ' + tooltips[context.dataIndex];
                                 }
                             }
                         },
