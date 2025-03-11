@@ -259,11 +259,12 @@
         
         svgMap.appendChild(path);
       });
+            
       
-      // Enable dragging
-      let isDragging = false;
-      let startX, startY;
-      
+      // Update zoom and pan
+      function updateZoom() {
+        svgMap.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+      }
       updateZoom();
     });
   </script>
