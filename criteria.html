@@ -264,31 +264,6 @@
       let isDragging = false;
       let startX, startY;
       
-      svgMap.addEventListener('mousedown', function(e) {
-        if (e.target.classList.contains('region')) return;
-        isDragging = true;
-        startX = e.clientX - translateX;
-        startY = e.clientY - translateY;
-        svgMap.style.cursor = 'grabbing';
-      });
-      
-      document.addEventListener('mousemove', function(e) {
-        if (!isDragging) return;
-        translateX = e.clientX - startX;
-        console.log("translateX  " + translateX);
-        translateY = e.clientY - startY;
-        updateZoom();
-      });
-      
-      document.addEventListener('mouseup', function() {
-        isDragging = false;
-        svgMap.style.cursor = 'grab';
-      });
-      
-      // Update zoom and pan
-      function updateZoom() {
-        svgMap.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-      }
       updateZoom();
     });
   </script>
