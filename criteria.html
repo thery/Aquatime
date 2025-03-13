@@ -186,7 +186,7 @@
               <label><input type="checkbox" name="gara" value="36" checked> 50 stile</label>
               <label><input type="checkbox" name="gara" value="32" checked> 100 stile</label>
               <label><input type="checkbox" name="gara" value="40" checked> 200 stile</label>
-              <label><input type="checkbox" name="gara" value="57" checked> 400 stile</label>
+              <label><input type="checkbox" name="gara" value="47" checked> 400 stile</label>
               <label><input type="checkbox" name="gara" value="48" checked> 800 stile</label>
               <label><input type="checkbox" name="gara" value="49" checked> 1500 stile</label>
               <label><input type="checkbox" name="gara" value="37" checked> 50 dorso</label>
@@ -408,6 +408,7 @@
           .then(response => response.json())
           .then(data => {
             // Filter and sort data
+            console.log(selected.categorie);
             const filteredAthletes = data
               .filter(athlete => athlete.regione == regionData.index &&
                 selected.sessi.includes(athlete.sesso) &&
