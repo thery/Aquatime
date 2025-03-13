@@ -50,6 +50,7 @@
             const regex = /(\d+)\)\s+(\d+)\s+([A-Z'\s]+)\s+(\d{4})\s+([A-Za-z\s-]+)\s+(\d{2}'\d{2}\.\d{2})/;
 
             lines.forEach(line => {
+                console.log(line);
                 let match = line.match(regex);
                 if (match) {
                     data.push({
