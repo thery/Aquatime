@@ -409,7 +409,6 @@
           .then(response => response.json())
           .then(data => {
             // Filter and sort data
-            console.log(selected.categorie);
             const filteredAthletes = data
               .filter(athlete => athlete.regione == regionData.index &&
                 selected.sessi.includes(athlete.sesso) &&
