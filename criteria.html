@@ -422,12 +422,12 @@
             filteredAthletes.forEach(athlete => {
               const row = document.createElement("tr");
               row.innerHTML = `<td class=thleft>
-                                  <a href="https://aquatime.it/tempi.php?Atleta=${athlete.idatleta}&Azione=2">${athlete.name}</a></td>
+                                  <a href="https://aquatime.it/tempi.php?Atleta=${athlete.idatleta}&Azione=2" target="_blank">${athlete.name}</a></td>
                                  <td class=thcenter>${athlete.sesso}</td>
                                  <td class=thright>${category.get(athlete.idcategoria)}</td>
                                  <td class=thright>${race.get(athlete.idtipogara)}</td>
                                  <td class=thright>
-                                 <a href="https://aquatime.it/records.php?comi=1&Stagione=${idstagione}&Atleta=${athlete.idatleta}&Categoria=${athlete.idcategoria}&Gara=${athlete.idtipogara}&tipoG=0&Vasca=1&Sesso=${athlete.sesso == "M" ? 1 : 2}&TipoTempi=2&SoloSoc=0#box3">
+                                 <a href="https://aquatime.it/records.php?comi=1&Stagione=${idstagione}&Atleta=${athlete.idatleta}&Categoria=${athlete.idcategoria}&Gara=${athlete.idtipogara}&tipoG=0&Vasca=1&Sesso=${athlete.sesso == "M" ? 1 : 2}&TipoTempi=2&SoloSoc=0#box3" target="_blank">
                                  ${athlete.swimtime}</a></td>`;
               tableBody.appendChild(row);
             });
