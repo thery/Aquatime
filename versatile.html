@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criteria Giovanili</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 1200px; margin: 0 auto; }
+        h1 { color: #0066cc; text-align: center; margin-bottom: 30px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; position: sticky; top: 0; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .search-container { margin-bottom: 20px; }
+        #searchInput { padding: 8px; width: 300px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px; }
+        .loading { text-align: center; padding: 30px; font-size: 18px; }
+        .error { color: red; padding: 15px; background-color: #ffeeee; border-radius: 5px; text-align: center; }
+        .summary { margin-bottom: 20px; background-color: #f0f8ff; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Criteria Nazionali Giovanili 2025</h1>
+    <div id="loading" class="loading">Loading data...</div>
+    <div id="error" class="error" style="display:none;"></div>
+    
+    <div id="content" style="display:none;">
+        <div class="summary" id="summary"></div>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Cerca Atleta">
+        </div>
+        
+        <table id="athletesTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Società</th>
+                    <th>Qualificazioni</th>
+                    <th>Gare</th>
+                </tr>
+            </thead>
+            <tbody id="athletesList"></tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('api_criteria25_all.php.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('content').style.display = 'block';
+                    analyzeAthleteFrequency(data);
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').textContent = `Error loading data: ${error.message}`;
+                });
+        });
+
+        function analyzeAthleteFrequency(data) {
+            // Create a mapping of event IDs to event names
+            const eventNames = {
+      "36" : "50 stile",
+      "32" : "100 stile",
+      "40" : "200 stile",
+      "47" : "400 stile",
+      "48" : "800 stile",
+      "49" : "1500 stile",
+      "37" : "50 dorso",
+      "33" : "100 dorso",
+      "41" : "200 dorso",
+      "38" : "50 rana",
+      "35" : "100 rana",
+      "43" : "200 rana",
+      "39" : "50 farfalla",
+      "34" : "100 farfalla",
+      "42" : "200 farfalla",
+      "45" : "200 misti",
+      "46" : "400 misti"
+            };
+            
+            // Process athlete data - count appearances and events
+            const athleteData = {};
+            
+            data.forEach(entry => {
+                const athleteId = entry.idatleta;
+                
+                if (!athleteData[athleteId]) {
+                    athleteData[athleteId] = {
+                        name: entry.name,
+                        club: entry.club,
+                        appearances: 0,
+                        events: new Set()
+                    };
+                }
+                
+                athleteData[athleteId].appearances++;
+                athleteData[athleteId].events.add(eventNames[entry.idtipogara] || `Event ${entry.idtipogara}`);
+            });
+            
+            // Convert to array for sorting
+            const athleteArray = Object.values(athleteData);
+            
+            // Sort by number of appearances (descending)
+            athleteArray.sort((a, b) => b.appearances - a.appearances);
+            
+            // Display summary information
+            const totalAthletes = athleteArray.length;
+            const totalAppearances = data.length;
+            const averageAppearances = (totalAppearances / totalAthletes).toFixed(2);
+            
+            document.getElementById('summary').innerHTML = `
+                <strong>Atleti:</strong> ${totalAthletes} |
+                <strong>Gare:</strong> ${totalAppearances} |
+                <strong>Media Gare per Atleti:</strong> ${averageAppearances}
+            `;
+            
+            // Display athlete data
+            const athletesList = document.getElementById('athletesList');
+            
+            athleteArray.forEach(athlete => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${athlete.name}</td>
+                    <td>${athlete.club}</td>
+                    <td>${athlete.appearances}</td>
+                    <td>${Array.from(athlete.events).join(', ')}</td>
+                `;
+                athletesList.appendChild(row);
+            });
+            
+            // Add search functionality
+            document.getElementById('searchInput').addEventListener('keyup', function() {
+                const searchValue = this.value.toLowerCase();
+                const rows = athletesList.getElementsByTagName('tr');
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const rowText = rows[i].textContent.toLowerCase();
+                    rows[i].style.display = rowText.includes(searchValue) ? '' : 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
