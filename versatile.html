@@ -96,6 +96,10 @@
                     athleteData[athleteId] = {
                         name: entry.name,
                         club: entry.club,
+                        sex : entry.sesso,
+                        idathlete : entry.idatleta,
+                        idcategory : entry.idcategoria,
+                        idrace : entry.idtipogara,
                         appearances: 0,
                         events: new Set()
                     };
@@ -124,14 +128,19 @@
             
             // Display athlete data
             const athletesList = document.getElementById('athletesList');
-            
+
+            const idstagione = 19;
+
+            function addEventLink (athlete, event) {
+                return  `<a href="https://aquatime.it/records.php?comi=1&Stagione=${idstagione}&Atleta=${athlete.idathlete}&Categoria=${athlete.idcategory}&Gara=${athlete.idrace}&tipoG=0&Vasca=1&Sesso=${athlete.sex == "M" ? 1 : 2}&TipoTempi=2&SoloSoc=0#box3" target="_blank">${event}</a>`;      
+            }            
             athleteArray.forEach(athlete => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${athlete.name}</td>
+                    <td><a href="https://aquatime.it/tempi.php?Atleta=${athlete.idathlete}&Azione=2" target="_blank">${athlete.name}</a></td>
                     <td>${athlete.club}</td>
                     <td>${athlete.appearances}</td>
-                    <td>${Array.from(athlete.events).join(', ')}</td>
+                    <td>${Array.from(athlete.events,(event) => addEventLink(athlete,event)).join(', ')}</td>
                 `;
                 athletesList.appendChild(row);
             });
