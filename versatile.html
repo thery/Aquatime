@@ -132,7 +132,9 @@
             const idstagione = 19;
 
             function addEventLink (athlete, event) {
-                return  `<a href="https://aquatime.it/records.php?comi=1&Stagione=${idstagione}&Atleta=${athlete.idathlete}&Categoria=${athlete.idcategory}&Gara=${athlete.idrace}&tipoG=0&Vasca=1&Sesso=${athlete.sex == "M" ? 1 : 2}&TipoTempi=2&SoloSoc=0#box3" target="_blank">${event}</a>`;      
+                const idgara = Object.keys(eventNames).find(key => eventNames[key] === event);
+                console.log(idgara);
+                return  `<a href="https://aquatime.it/records.php?comi=1&Stagione=${idstagione}&Atleta=${athlete.idathlete}&Categoria=${athlete.idcategory}&Gara=${idgara}&tipoG=0&Vasca=1&Sesso=${athlete.sex == "M" ? 1 : 2}&TipoTempi=2&SoloSoc=0#box3" target="_blank">${event}</a>`;      
             }            
             athleteArray.forEach(athlete => {
                 const row = document.createElement('tr');
