@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Progressione</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .chart-container {
+      width: 80%;
+      margin: 0 auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      font-size: 18px;
+    }
+
+    .error {
+      color: red;
+      padding: 15px;
+      background-color: #ffeeee;
+      border-radius: 5px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Progressione</h2>
+
+  <div id="loading" class="loading">Loading data...</div>
+  <div id="error" class="error" style="display:none;"></div>
+  <div id="content" style="display:none;">
+  </div>
+  <div class="chart-container">
+    <canvas id="raceChart"></canvas>
+  </div>
+
+  <script>
+    // Create a mapping of event IDs to event names
+    const eventNames = {
+      "36": "50 stile",
+      "32": "100 stile",
+      "40": "200 stile",
+      "47": "400 stile",
+      "48": "800 stile",
+      "49": "1500 stile",
+      "37": "50 dorso",
+      "33": "100 dorso",
+      "41": "200 dorso",
+      "38": "50 rana",
+      "35": "100 rana",
+      "43": "200 rana",
+      "39": "50 farfalla",
+      "34": "100 farfalla",
+      "42": "200 farfalla",
+      "45": "200 misti",
+      "46": "400 misti"
+    };
+    const categories = [
+      "C1",
+      "C2",
+      "B1",
+      "B2",
+      "A1",
+      "A2",
+      "RAG1",
+      "RAG2",
+      "RAG3",
+      "JUN1",
+      "JUN2",
+      "CAD",
+      "SEN"
+    ];
+
+    // Default Colors for the swimmers
+    var colors = [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 206, 86)',
+      'rgb(75, 192, 192)'
+    ];
+    var chartInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('progressione.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('content').style.display = 'block';
+          analyzeProgression(data);
+        })
+        .catch(error => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('error').style.display = 'block';
+          document.getElementById('error').textContent = `Error loading data: ${error.message}`;
+        });
+    });
+    // Process the data for Chart.js
+    function processData(json) {
+      const swimmers = {};
+
+      // Initialize swimmer data arrays
+      for (let i = 0; i < json.legend.length; i++) {
+        swimmers[i] = [];
+      }
+
+      // Process the split times (data1)
+      for (let i = 0; i < json.data.length; i++) {
+        const entry = json.data[i];
+
+        // Add data for each swimmer
+        for (let j = 0; j < json.legend.length; j++) {
+          const time = entry[j + 1] == 0 ? null : entry[j + 1]  ;
+          swimmers[j].push(time);
+        }
+      }
+      return swimmers
+    }
+
+    function analyzeProgression(data) {
+      let swimmers = processData(data);
+      for (let i = 4; i < data.legend.length; i++) {
+        var o = Math.round, r = Math.random, s = 255;
+        colors.push('rgb(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ')');
+      }
+      createChart(swimmers, data.legend, eventNames[data.idgara]);
+    }
+
+    function formatTime(hundredths) {
+      const totalSeconds = hundredths / 100;
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = Math.floor(totalSeconds % 60);
+      const remainingHundredths = hundredths % 100;
+
+      return `${minutes.toString().padStart(2, '0')}'${seconds.toString().padStart(2, '0')}''${remainingHundredths.toString().padStart(2, '0')}`;
+    }
+    function createChart(swimmers, legend, gara) {
+      const ctx = document.getElementById('raceChart').getContext('2d');
+
+      let datasets = [];
+      let chartTitle = gara;
+      let yAxisLabel = 'Tempo';
+
+      for (let i = 0; i < legend.length; i++) {
+        datasets.push({
+          label: legend[i],
+          data: swimmers[i],
+          borderColor: colors[i],
+          backgroundColor: colors[i] + '33', // Add transparency
+          fill: false,
+          tension: 0.1
+        });
+      }
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: categories,
+          datasets: datasets
+        },
+        options: {
+          spanGaps: true,
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: chartTitle,
+              font: {
+                size: 18
+              }
+            },
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += formatTime(Math.round(context.parsed.y * 100)) + '';
+                  }
+                  return label;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Categoria'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: yAxisLabel
+              },
+              ticks: {
+                callback: function (value) {
+                  return formatTime(Math.round(value * 100)) + '';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function showChart(swimmers, legend, gara) {
+      createChart(swimmers, legend), gara;
+    }
+
+
+  </script>
+</body>
+
+</html>
