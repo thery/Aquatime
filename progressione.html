@@ -48,7 +48,7 @@
       flex: 1;
     }
 
-    .search{
+    .search {
       width: 100%;
     }
 
@@ -74,14 +74,14 @@
   <div class="search-container">
     <div class="search-box">
       <h3>Primo Atleta</h3>
-      <input class = "search" type="text" id="search1" placeholder="Cerca">
+      <input class="search" type="text" id="search1" placeholder="Cerca">
       <div id="results1"></div>
       <div id="selected1"></div>
     </div>
 
     <div class="search-box">
       <h3>Secondo Atleta</h3>
-      <input class = "search" type="text" id="search2" placeholder="Cerca">
+      <input class="search" type="text" id="search2" placeholder="Cerca">
       <div id="results2"></div>
       <div id="selected2"></div>
     </div>
@@ -264,7 +264,14 @@
             document.getElementById('error').style.display = 'block';
             document.getElementById('error').textContent = `Error loading data: ${error.message}`;
           });
-
+      } else {
+        if (chartInstance != null) {
+          console.log('destroying chart');
+          chartInstance.destroy();
+          chartInstance = null;
+          const outputDiv = document.getElementById('output');
+          outputDiv.innerHTML = '';
+        }
       }
     }
 
@@ -307,91 +314,91 @@
       const seconds = Math.floor(totalSeconds % 60);
       const remainingHundredths = hundredths % 100;
 
-      return `${minutes.toString().padStart(2, '0')}'${seconds.toString().padStart(2, '0')}''${remainingHundredths.toString().padStart(2, '0')}`;
-    }
-    function createChart(swimmers, legend, gara) {
-      const ctx = document.getElementById('raceChart').getContext('2d');
-
-      let datasets = [];
-      let chartTitle = gara;
-      let yAxisLabel = 'Tempo';
-
-      for (let i = 0; i < legend.length; i++) {
-        datasets.push({
-          label: legend[i],
-          data: swimmers[i],
-          borderColor: colors[i],
-          backgroundColor: colors[i] + '33', // Add transparency
-          fill: false,
-          tension: 0.1
-        });
-      }
-
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
-
-      chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: categories,
-          datasets: datasets
-        },
-        options: {
-          spanGaps: true,
-          responsive: true,
-          plugins: {
-            title: {
-              display: true,
-              text: chartTitle,
-              font: {
-                size: 18
-              }
-            },
-            legend: {
-              position: 'bottom'
-            },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  let label = context.dataset.label || '';
-                  if (label) {
-                    label += ': ';
-                  }
-                  if (context.parsed.y !== null) {
-                    label += formatTime(Math.round(context.parsed.y * 100)) + '';
-                  }
-                  return label;
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: 'Categoria'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: yAxisLabel
-              },
-              ticks: {
-                callback: function (value) {
-                  return formatTime(Math.round(value * 100)) + '';
-                }
-              }
-            }
-          }
+      return `${ minutes.toString().padStart(2, '0') } '${seconds.toString().padStart(2, '0')}''${remainingHundredths.toString().padStart(2, '0')}`;
         }
-      });
-    }
+        function createChart(swimmers, legend, gara) {
+          const ctx = document.getElementById('raceChart').getContext('2d');
 
-    function showChart(swimmers, legend, gara) {
-      createChart(swimmers, legend), gara;
-    }
+          let datasets = [];
+          let chartTitle = gara;
+          let yAxisLabel = 'Tempo';
+
+          for (let i = 0; i < legend.length; i++) {
+            datasets.push({
+              label: legend[i],
+              data: swimmers[i],
+              borderColor: colors[i],
+              backgroundColor: colors[i] + '33', // Add transparency
+              fill: false,
+              tension: 0.1
+            });
+          }
+
+          if (chartInstance) {
+            chartInstance.destroy();
+          }
+
+          chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: categories,
+              datasets: datasets
+            },
+            options: {
+              spanGaps: true,
+              responsive: true,
+              plugins: {
+                title: {
+                  display: true,
+                  text: chartTitle,
+                  font: {
+                    size: 18
+                  }
+                },
+                legend: {
+                  position: 'bottom'
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      let label = context.dataset.label || '';
+                      if (label) {
+                        label += ': ';
+                      }
+                      if (context.parsed.y !== null) {
+                        label += formatTime(Math.round(context.parsed.y * 100)) + '';
+                      }
+                      return label;
+                    }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Categoria'
+                  }
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: yAxisLabel
+                  },
+                  ticks: {
+                    callback: function (value) {
+                      return formatTime(Math.round(value * 100)) + '';
+                    }
+                  }
+                }
+              }
+            }
+          });
+        }
+
+        function showChart(swimmers, legend, gara) {
+          createChart(swimmers, legend), gara;
+        }
 
 
   </script>
