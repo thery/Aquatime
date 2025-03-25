@@ -4,6 +4,8 @@
 <head>
   <title>Progressione</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -34,19 +36,93 @@
       border-radius: 5px;
       text-align: center;
     }
+
+    .search-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+
+    .search-box {
+      flex: 1;
+    }
+
+    .search{
+      width: 100%;
+    }
+
+    #results1,
+    #results2 {
+      border: 1px solid #ddd;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .selected-athlete {
+      background-color: #bfd3df;
+      padding: 10px;
+      margin: 10px 0;
+    }
   </style>
 </head>
 
 <body>
-  <h2>Progressione</h2>
+  <h1>Progressione</h1>
 
-  <div id="loading" class="loading">Loading data...</div>
+
+  <div class="search-container">
+    <div class="search-box">
+      <h3>Primo Atleta</h3>
+      <input class = "search" type="text" id="search1" placeholder="Cerca">
+      <div id="results1"></div>
+      <div id="selected1"></div>
+    </div>
+
+    <div class="search-box">
+      <h3>Secondo Atleta</h3>
+      <input class = "search" type="text" id="search2" placeholder="Cerca">
+      <div id="results2"></div>
+      <div id="selected2"></div>
+    </div>
+  </div>
+
+  <div>
+    <h3>Gara</h3>
+    <select id="raceSelect">
+      <option value="">Selezionna una gara</option>
+      <option value="36">50 stile</option>
+      <option value="32">100 stile</option>
+      <option value="40">200 stile</option>
+      <option value="47">400 stile</option>
+      <option value="48">800 stile</option>
+      <option value="49">1500 stile</option>
+      <option value="37">50 dorso</option>
+      <option value="33">100 dorso</option>
+      <option value="41">200 dorso</option>
+      <option value="38">50 rana</option>
+      <option value="35">100 rana</option>
+      <option value="43">200 rana</option>
+      <option value="39">50 farfalla</option>
+      <option value="34">100 farfalla</option>
+      <option value="42">200 farfalla</option>
+      <option value="45">200 misti</option>
+      <option value="46">400 misti</option>
+    </select>
+  </div>
+  <p></p>
+
+  <div id="output"></div>
+
+
+  <div id="loading" class="loading"></div>
   <div id="error" class="error" style="display:none;"></div>
   <div id="content" style="display:none;">
   </div>
   <div class="chart-container">
     <canvas id="raceChart"></canvas>
   </div>
+
 
   <script>
     // Create a mapping of event IDs to event names
@@ -94,25 +170,106 @@
     ];
     var chartInstance = null;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('progressione.json')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('content').style.display = 'block';
-          analyzeProgression(data);
-        })
-        .catch(error => {
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('error').style.display = 'block';
-          document.getElementById('error').textContent = `Error loading data: ${error.message}`;
-        });
-    });
+    let selectedAthletes = [null, null];
+
+    function debounce(func, timeout = 300) {
+      let timer;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+      };
+    }
+
+    async function searchAthletes(query, resultsDiv, athleteIndex) {
+      if (query.length < 2) {
+        resultsDiv.innerHTML = '';
+        return;
+      }
+
+      try {
+        // const response = await axios.get(`https://aquatime.it/APILT/serch.php?AtletaSRC=${query}`, { responseType: "json" });
+        //const athletes = response.data;
+        const response = await axios.get(`search.json`, { responseType: "json" });
+        const athletes = response.data.filter((athlete) => athlete.name.toUpperCase().includes(query.toUpperCase()));
+        resultsDiv.innerHTML = athletes.map(athlete =>
+          `<div onclick="selectAthlete(${JSON.stringify(athlete).replace(/"/g, '&quot;')}, ${athlete.id_athlete}, ${athleteIndex})">
+                       ${athlete.name} (${athlete.team}, ${athlete.year})
+                 </div>`
+        ).join('');
+      } catch (error) {
+        console.error('Error searching athletes:', error);
+        resultsDiv.innerHTML = 'Error searching athletes';
+      }
+    }
+
+    const debouncedSearch1 = debounce((e) => searchAthletes(e.target.value, document.getElementById('results1'), 0));
+    const debouncedSearch2 = debounce((e) => searchAthletes(e.target.value, document.getElementById('results2'), 1));
+
+    document.getElementById('search1').addEventListener('input', debouncedSearch1);
+    document.getElementById('search2').addEventListener('input', debouncedSearch2);
+
+    function selectAthlete(athlete, id, index) {
+      selectedAthletes[index] = id;
+
+      const selectedDiv = document.getElementById(`selected${index + 1}`);
+      const resultsDiv = document.getElementById(`results${index + 1}`);
+
+      selectedDiv.innerHTML = `
+                <div class="selected-athlete" }>
+                    ${athlete.name} &nbsp; &nbsp;       
+                    <button onclick="clearAthlete(${index})">Cancella</button>
+                </div>
+            `;
+      resultsDiv.innerHTML = '';
+      document.getElementById(`search${index + 1}`).value = '';
+
+      checkSelections();
+    }
+
+    function clearAthlete(index) {
+      selectedAthletes[index] = null;
+      document.getElementById(`selected${index + 1}`).innerHTML = '';
+      checkSelections();
+    }
+
+    function checkSelections() {
+      const raceSelect = document.getElementById('raceSelect');
+      const generateButton = document.getElementById('generateProg');
+
+      if (selectedAthletes[0] && selectedAthletes[1] && raceSelect.value) {
+        const athlete1 = selectedAthletes[0];
+        const athlete2 = selectedAthletes[1];
+        const raceSelect = document.getElementById('raceSelect');
+        const raceName = eventNames[raceSelect.value];
+
+        const outputDiv = document.getElementById('output');
+        outputDiv.innerHTML = `
+                <p> id ${athlete1} vs id ${athlete2} per la gara ${raceSelect.value}</p>
+            `;
+        document.getElementById('loading').textContent = 'Caricando...';
+        fetch('progressione.json')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            analyzeProgression(data);
+          })
+          .catch(error => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = `Error loading data: ${error.message}`;
+          });
+
+      }
+    }
+
+    document.getElementById('raceSelect').addEventListener('change', checkSelections);
+
     // Process the data for Chart.js
     function processData(json) {
       const swimmers = {};
@@ -128,7 +285,7 @@
 
         // Add data for each swimmer
         for (let j = 0; j < json.legend.length; j++) {
-          const time = entry[j + 1] == 0 ? null : entry[j + 1]  ;
+          const time = entry[j + 1] == 0 ? null : entry[j + 1];
           swimmers[j].push(time);
         }
       }
