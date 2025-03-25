@@ -8,7 +8,7 @@
 
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial sans-serif,
       margin: 20px;
     }
 
@@ -17,10 +17,15 @@
       margin: 0 auto;
     }
 
+    h1 {
+      text-align: center;
+      color: #69f;
+      margin-bottom: 30px;
+    }
+
     h2 {
       text-align: center;
-      color: #333;
-      margin-bottom: 30px;
+      color: #69f;
     }
 
     .loading {
@@ -49,6 +54,8 @@
     }
 
     .search {
+      font-family: Arial sans-serif;
+      font-size : 1.2em;
       width: 100%;
     }
 
@@ -60,6 +67,7 @@
     }
 
     .selected-athlete {
+      font-size : 1.2em;
       background-color: #bfd3df;
       padding: 10px;
       margin: 10px 0;
@@ -73,14 +81,14 @@
 
   <div class="search-container">
     <div class="search-box">
-      <h3>Primo Atleta</h3>
+      <h2>Primo Atleta</h3>
       <input class="search" type="text" id="search1" placeholder="Entra il nome">
       <div id="results1"></div>
       <div id="selected1"></div>
     </div>
 
     <div class="search-box">
-      <h3>Secondo Atleta</h3>
+      <h2>Secondo Atleta</h3>
       <input class="search" type="text" id="search2" placeholder="Entra il nome">
       <div id="results2"></div>
       <div id="selected2"></div>
@@ -88,8 +96,8 @@
   </div>
 
   <div>
-    <h3>Gara</h3>
-    <select id="raceSelect">
+    <h2 style="text-align : left">Gara</h2>
+    <select class="search" id="raceSelect">
       <option value="">Selezionna una gara</option>
       <option value="36">50 stile</option>
       <option value="32">100 stile</option>
