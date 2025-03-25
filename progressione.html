@@ -8,7 +8,6 @@
 
   <style>
     body {
-      font-family: Arial sans-serif,
       margin: 20px;
     }
 
@@ -18,12 +17,14 @@
     }
 
     h1 {
+      font-family: Arial, sans-serif;
       text-align: center;
       color: #69f;
       margin-bottom: 30px;
     }
 
     h2 {
+      font-family: Arial, sans-serif;
       text-align: center;
       color: #69f;
     }
@@ -54,7 +55,7 @@
     }
 
     .search {
-      font-family: Arial sans-serif;
+      font-family: Arial, sans-serif;
       font-size : 1.2em;
       width: 100%;
     }
@@ -67,6 +68,7 @@
     }
 
     .selected-athlete {
+      font-family: Arial, sans-serif;
       font-size : 1.2em;
       background-color: #bfd3df;
       padding: 10px;
@@ -98,7 +100,7 @@
   <div>
     <h2 style="text-align : left">Gara</h2>
     <select class="search" id="raceSelect">
-      <option value="">Selezionna una gara</option>
+      <option value="">Seleziona una gara</option>
       <option value="36">50 stile</option>
       <option value="32">100 stile</option>
       <option value="40">200 stile</option>
@@ -244,7 +246,7 @@
       const raceSelect = document.getElementById('raceSelect');
       const generateButton = document.getElementById('generateProg');
 
-      if (selectedAthletes[0] && selectedAthletes[1] && raceSelect.value) {
+      if (selectedAthletes[0] && raceSelect.value) {
         const athlete1 = selectedAthletes[0];
         const athlete2 = selectedAthletes[1];
         const raceSelect = document.getElementById('raceSelect');
