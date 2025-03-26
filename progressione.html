@@ -255,7 +255,7 @@
 
         const outputDiv = document.getElementById('output');
         outputDiv.innerHTML = `
-                <p> id ${athlete1} vs id ${athlete2} per la gara ${raceSelect.value}</p>
+                <p> https://aquatime.it/APILT/progress.php?id+atl1="${athlete1}"&id_atl2="${athlete2}"&i_gara="${raceSelect.value}"</p>
             `;
         document.getElementById('loading').textContent = 'Caricando...';
         fetch('progressione.json')
