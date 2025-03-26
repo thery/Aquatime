@@ -182,7 +182,7 @@
 
     let selectedAthletes = [null, null];
 
-    function debounce(func, timeout = 300) {
+    function debounce(func, timeout = 500) {
       let timer;
       return (...args) => {
         clearTimeout(timer);
@@ -197,16 +197,17 @@
       }
 
       try {
-        // const response = await axios.get(`https://aquatime.it/APILT/serch.php?AtletaSRC=${query}`, { responseType: "json" });
+        // const response = await axios.get(`https://aquatime.it/APILT/serch.php?AtletaSRC="${query}"`, { responseType: "json" });
         //const athletes = response.data;
         const response = await axios.get(`search.json`, { responseType: "json" });
         const athletes = response.data.filter((athlete) => athlete.name.toUpperCase().includes(query.toUpperCase()));
-        resultsDiv.innerHTML = athletes.map(athlete =>
+        resultsDiv.innerHTML = 
+        `search = https://aquatime.it/APILT/serch.php?AtletaSRC="${query}"`.concat(
+        athletes.map(athlete =>
           `<div onclick="selectAthlete(${JSON.stringify(athlete).replace(/"/g, '&quot;')}, ${athlete.id_athlete}, ${athleteIndex})">
                        ${athlete.name} (${athlete.team}, ${athlete.year})
                  </div>`
-        ).join('');
-      } catch (error) {
+        ).join(''));} catch (error) {
         console.error('Error searching athletes:', error);
         resultsDiv.innerHTML = 'Error searching athletes';
       }
