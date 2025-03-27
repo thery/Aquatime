@@ -56,7 +56,7 @@
 
     .search {
       font-family: Arial, sans-serif;
-      font-size : 1.2em;
+      font-size: 1.2em;
       width: 100%;
     }
 
@@ -69,7 +69,7 @@
 
     .selected-athlete {
       font-family: Arial, sans-serif;
-      font-size : 1.2em;
+      font-size: 1.2em;
       background-color: #bfd3df;
       padding: 10px;
       margin: 10px 0;
@@ -84,26 +84,26 @@
   <div class="search-container">
     <div class="search-box">
       <h2>Primo Atleta</h3>
-      <input class="search" type="text" id="search1" placeholder="Entra il nome">
-      <div id="results1"></div>
-      <div id="selected1"></div>
+        <input class="search" type="text" id="search1" placeholder="Entra il nome">
+        <div id="results1"></div>
+        <div id="selected1"></div>
     </div>
 
     <div class="search-box">
       <h2>Secondo Atleta</h3>
-      <input class="search" type="text" id="search2" placeholder="Entra il nome">
-      <div id="results2"></div>
-      <div id="selected2"></div>
+        <input class="search" type="text" id="search2" placeholder="Entra il nome">
+        <div id="results2"></div>
+        <div id="selected2"></div>
     </div>
   </div>
 
   <div>
     <h2 style="text-align : left">Gara</h2>
-  <div>
-  <label><input onclick='handleVasca(0);' type="radio" name="vasca" value="0" checked>25m</label>
-  <label><input onclick='handleVasca(1);' type="radio" name="vasca" value="1">50m</label>
-  </div>
-  <br>
+    <div>
+      <label><input onclick='handleVasca(0);' type="radio" name="vasca" value="0" checked>25m</label>
+      <label><input onclick='handleVasca(1);' type="radio" name="vasca" value="1">50m</label>
+    </div>
+    <br>
     <select class="search" id="raceSelect">
       <option value="">Seleziona una gara</option>
       <option value="36">50 stile</option>
@@ -140,6 +140,11 @@
 
 
   <script>
+    var debug = true;
+    var search_script = 'https://aquatime.it/APILT/serch.php';
+    var progress_script = 'https://aquatime.it/APILT/progress.php';
+    var debug_search_json = 'search.json';
+    var debug_progress_json = 'progressione.json';
     // Create a mapping of event IDs to event names
     const eventNames = {
       "36": "50 stile",
@@ -208,16 +213,18 @@
       }
 
       try {
-        // const response = await axios.get(`https://aquatime.it/APILT/serch.php?AtletaSRC="${query}"`, { responseType: "json" });
-        //const athletes = response.data;
-        const response = await axios.get(`search.json`, { responseType: "json" });
-        const athletes = response.data.filter((athlete) => athlete.name.toUpperCase().includes(query.toUpperCase()));
-        resultsDiv.innerHTML = `search = https://aquatime.it/APILT/serch.php?AtletaSRC="${query}"`;
+        const response = await axios.get(debug ? debug_search_json : `${search_script}?AtletaSRC="${query}"`, { responseType: "json" });
+        var athletes = response.data;
+        if (debug) {
+          athletes = athletes.filter((athlete) => athlete.name.toUpperCase().includes(query.toUpperCase()));
+        }
+        resultsDiv.innerHTML = debug ? `search = https://aquatime.it/APILT/serch.php?AtletaSRC="${query}"` : ``;
         resultsDiv.innerHTML += athletes.map(athlete =>
           `<div onclick="selectAthlete(${JSON.stringify(athlete).replace(/"/g, '&quot;')}, ${athlete.id_athlete}, ${athleteIndex})">
                        ${athlete.name} (${athlete.team}, ${athlete.year})
                  </div>`
-        ).join('');} catch (error) {
+        ).join('');
+      } catch (error) {
         console.error('Error searching athletes:', error);
         resultsDiv.innerHTML = 'Error searching athletes';
       }
@@ -264,11 +271,10 @@
         const raceName = eventNames[raceSelect.value];
 
         const outputDiv = document.getElementById('output');
-        outputDiv.innerHTML = `
-                <p> https://aquatime.it/APILT/progress.php?id_atl1="${athlete1}"&id_atl2="${athlete2}"&id_gara="${raceSelect.value}"&Vasca="${vasca}"</p>
-            `;
+        const pquery = `${progress_script}?id_atl1="${athlete1}"&id_atl2="${athlete2}"&id_gara="${raceSelect.value}"&Vasca="${vasca}"`;
+        outputDiv.innerHTML = debug ? ` <p> ${pquery} </p>` : '';
         document.getElementById('loading').textContent = 'Caricando...';
-        fetch('progressione.json')
+        fetch(debug ? debug_progress_json : pquery)
           .then(response => {
             if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -335,91 +341,91 @@
       const seconds = Math.floor(totalSeconds % 60);
       const remainingHundredths = hundredths % 100;
 
-      return `${ minutes.toString().padStart(2, '0') } '${seconds.toString().padStart(2, '0')}''${remainingHundredths.toString().padStart(2, '0')}`;
-        }
-        function createChart(swimmers, legend, gara) {
-          const ctx = document.getElementById('raceChart').getContext('2d');
+      return `${minutes.toString().padStart(2, '0')} '${seconds.toString().padStart(2, '0')}''${remainingHundredths.toString().padStart(2, '0')}`;
+    }
+    function createChart(swimmers, legend, gara) {
+      const ctx = document.getElementById('raceChart').getContext('2d');
 
-          let datasets = [];
-          let chartTitle = gara + ' vasca ' + (vasca == 0 ? '25m' : '50m');
-          let yAxisLabel = 'Tempo';
+      let datasets = [];
+      let chartTitle = gara + ' vasca ' + (vasca == 0 ? '25m' : '50m');
+      let yAxisLabel = 'Tempo';
 
-          for (let i = 0; i < legend.length; i++) {
-            datasets.push({
-              label: legend[i],
-              data: swimmers[i],
-              borderColor: colors[i],
-              backgroundColor: colors[i] + '33', // Add transparency
-              fill: false,
-              tension: 0.1
-            });
-          }
+      for (let i = 0; i < legend.length; i++) {
+        datasets.push({
+          label: legend[i],
+          data: swimmers[i],
+          borderColor: colors[i],
+          backgroundColor: colors[i] + '33', // Add transparency
+          fill: false,
+          tension: 0.1
+        });
+      }
 
-          if (chartInstance) {
-            chartInstance.destroy();
-          }
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
 
-          chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: categories,
-              datasets: datasets
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: categories,
+          datasets: datasets
+        },
+        options: {
+          spanGaps: true,
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: chartTitle,
+              font: {
+                size: 18
+              }
             },
-            options: {
-              spanGaps: true,
-              responsive: true,
-              plugins: {
-                title: {
-                  display: true,
-                  text: chartTitle,
-                  font: {
-                    size: 18
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
                   }
-                },
-                legend: {
-                  position: 'bottom'
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function (context) {
-                      let label = context.dataset.label || '';
-                      if (label) {
-                        label += ': ';
-                      }
-                      if (context.parsed.y !== null) {
-                        label += formatTime(Math.round(context.parsed.y * 100)) + '';
-                      }
-                      return label;
-                    }
+                  if (context.parsed.y !== null) {
+                    label += formatTime(Math.round(context.parsed.y * 100)) + '';
                   }
-                }
-              },
-              scales: {
-                x: {
-                  title: {
-                    display: true,
-                    text: 'Categoria'
-                  }
-                },
-                y: {
-                  title: {
-                    display: true,
-                    text: yAxisLabel
-                  },
-                  ticks: {
-                    callback: function (value) {
-                      return formatTime(Math.round(value * 100)) + '';
-                    }
-                  }
+                  return label;
                 }
               }
             }
-          });
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Categoria'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: yAxisLabel
+              },
+              ticks: {
+                callback: function (value) {
+                  return formatTime(Math.round(value * 100)) + '';
+                }
+              }
+            }
+          }
         }
+      });
+    }
 
-        function showChart(swimmers, legend, gara) {
-          createChart(swimmers, legend), gara;
-        }
+    function showChart(swimmers, legend, gara) {
+      createChart(swimmers, legend), gara;
+    }
 
 
   </script>
