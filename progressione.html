@@ -99,6 +99,11 @@
 
   <div>
     <h2 style="text-align : left">Gara</h2>
+  <div>
+  <label><input onclick='handleVasca(0);' type="radio" name="vasca" value="0" checked>25m</label>
+  <label><input onclick='handleVasca(1);' type="radio" name="vasca" value="1">50m</label>
+  </div>
+  <br>
     <select class="search" id="raceSelect">
       <option value="">Seleziona una gara</option>
       <option value="36">50 stile</option>
@@ -190,6 +195,12 @@
       };
     }
 
+    var vasca = "0";
+    function handleVasca(val) {
+      vasca = val;
+      checkSelections();
+    }
+
     async function searchAthletes(query, resultsDiv, athleteIndex) {
       if (query.length < 2) {
         resultsDiv.innerHTML = '';
@@ -254,7 +265,7 @@
 
         const outputDiv = document.getElementById('output');
         outputDiv.innerHTML = `
-                <p> https://aquatime.it/APILT/progress.php?id_atl1="${athlete1}"&id_atl2="${athlete2}"&id_gara="${raceSelect.value}"</p>
+                <p> https://aquatime.it/APILT/progress.php?id_atl1="${athlete1}"&id_atl2="${athlete2}"&id_gara="${raceSelect.value}"&Vasca="${vasca}"</p>
             `;
         document.getElementById('loading').textContent = 'Caricando...';
         fetch('progressione.json')
@@ -330,7 +341,7 @@
           const ctx = document.getElementById('raceChart').getContext('2d');
 
           let datasets = [];
-          let chartTitle = gara;
+          let chartTitle = gara + ' vasca ' + (vasca == 0 ? '25m' : '50m');
           let yAxisLabel = 'Tempo';
 
           for (let i = 0; i < legend.length; i++) {
