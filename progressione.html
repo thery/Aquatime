@@ -227,7 +227,7 @@
         ).join('');
       } catch (error) {
         console.error('Error searching athletes:', error);
-        resultsDiv.innerHTML = 'Error searching athletes';
+        resultsDiv.innerHTML = 'Errore';
       }
     }
 
@@ -285,7 +285,7 @@
           .then(data => {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('content').style.display = 'block';
-            analyzeProgression(data);
+            analyzeProgression(data[0]);
           })
           .catch(error => {
             document.getElementById('loading').style.display = 'none';
@@ -307,7 +307,6 @@
 
     // Process the data for Chart.js
     function processData(json) {
-      console.log("data = " + json.data);
       const swimmers = {};
       var cats = [];
 
@@ -318,7 +317,7 @@
 
       // Process legends, the split times (data1)
       for (let i = 0; i < json.data.length; i++) {
-        const entry = json.data[i];
+        const entry = json.data[i][0].split(",");
         cats.push(categories[entry[0] - 1]);
         // Addlegends,  data for each swimmer
         for (let j = 0; j < json.legend.length; j++) {
@@ -347,7 +346,6 @@
       return `${minutes.toString().padStart(2, '0')} '${seconds.toString().padStart(2, '0')}''${remainingHundredths.toString().padStart(2, '0')}`;
     }
     function createChart(cats, swimmers, legend, gara) {
-    console.log('cats3' + cats);
     const ctx = document.getElementById('raceChart').getContext('2d');
 
       let datasets = [];
