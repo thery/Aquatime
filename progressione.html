@@ -306,33 +306,35 @@
 
     // Process the data for Chart.js
     function processData(json) {
+      console.log("data = " + json.data);
       const swimmers = {};
+      var cats = [];
 
       // Initialize swimmer data arrays
       for (let i = 0; i < json.legend.length; i++) {
         swimmers[i] = [];
       }
 
-      // Process the split times (data1)
+      // Process legends, the split times (data1)
       for (let i = 0; i < json.data.length; i++) {
         const entry = json.data[i];
-
-        // Add data for each swimmer
+        cats.push(categories[entry[0] - 1]);
+        // Addlegends,  data for each swimmer
         for (let j = 0; j < json.legend.length; j++) {
           const time = entry[j + 1] == 0 ? null : entry[j + 1];
           swimmers[j].push(time);
         }
       }
-      return swimmers
+      return [cats, swimmers]
     }
 
     function analyzeProgression(data) {
-      let swimmers = processData(data);
+      let result = processData(data);
       for (let i = 4; i < data.legend.length; i++) {
         var o = Math.round, r = Math.random, s = 255;
         colors.push('rgb(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ')');
       }
-      createChart(swimmers, data.legend, eventNames[data.idgara]);
+      createChart(result[0], result[1], data.legend, eventNames[data.idgara]);
     }
 
     function formatTime(hundredths) {
@@ -343,8 +345,9 @@
 
       return `${minutes.toString().padStart(2, '0')} '${seconds.toString().padStart(2, '0')}''${remainingHundredths.toString().padStart(2, '0')}`;
     }
-    function createChart(swimmers, legend, gara) {
-      const ctx = document.getElementById('raceChart').getContext('2d');
+    function createChart(cats, swimmers, legend, gara) {
+    console.log('cats3' + cats);
+    const ctx = document.getElementById('raceChart').getContext('2d');
 
       let datasets = [];
       let chartTitle = gara + ' vasca ' + (vasca == 0 ? '25m' : '50m');
@@ -368,7 +371,7 @@
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: categories,
+          labels: cats,
           datasets: datasets
         },
         options: {
