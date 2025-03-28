@@ -141,11 +141,9 @@
 
 
   <script>
-    var debug = false;
-    var search_script = 'https://aquatime.it/APILT/serch.php';
-    var progress_script = 'https://aquatime.it/APILT/progress.php';
-    var debug_search_json = 'search.json';
-    var debug_progress_json = 'progressione.json';
+    var debug = true;
+    var search_script = 'serch.php';
+    var progress_script = 'progress.php';
     // Create a mapping of event IDs to event names
     const eventNames = {
       "36": "50 stile",
@@ -214,18 +212,21 @@
       }
 
       try {
-        console.log('request = ' + `${search_script}?AtletaSRC="${query}"`);
-        const response = await axios.get(debug ? debug_search_json : `${search_script}?AtletaSRC=${query}`, { responseType: "json" });
-        var athletes = response.data;
+        const request = `${search_script}?AtletaSRC=${query}`;
         if (debug) {
-          athletes = athletes.filter((athlete) => athlete.name.toUpperCase().includes(query.toUpperCase()));
+          console.log('request = ' + request);
         }
-        resultsDiv.innerHTML = debug ? `search = https://aquatime.it/APILT/serch.php?AtletaSRC="${query}"` : ``;
-        resultsDiv.innerHTML += athletes.map(athlete =>
-          `<div onclick="selectAthlete(${JSON.stringify(athlete).replace(/"/g, '&quot;')}, ${athlete.id_athlete}, ${athleteIndex})">
+        const response = await axios.get(request, { responseType: "json" });
+        var athletes = response.data;
+        if (athletes[0] = "Non Disponibile") {
+          resultsDiv.innerHTML = 'Nessuna Risposta';
+        } else {
+          resultsDiv.innerHTML += athletes.map(athlete =>
+            `<div onclick="selectAthlete(${JSON.stringify(athlete).replace(/"/g, '&quot;')}, ${athlete.id_athlete}, ${athleteIndex})">
                        ${athlete.name} (${athlete.team}, ${athlete.year})
                  </div>`
-        ).join('');
+          ).join('');
+        }
       } catch (error) {
         console.error('Error searching athletes:', error);
         resultsDiv.innerHTML = 'Errore';
@@ -273,14 +274,15 @@
         const raceName = eventNames[raceSelect.value];
 
         const outputDiv = document.getElementById('output');
-        const pquery = `${progress_script}?id_atl1=${athlete1}&id_atl2=${athlete2}&id_gara=${raceSelect.value}&Vasca=${vasca}`;
-        outputDiv.innerHTML = debug ? ` <p> ${pquery} </p>` : '';
+        const request = `${progress_script}?id_atl1=${athlete1}&id_atl2=${athlete2}&id_gara=${raceSelect.value}&Vasca=${vasca}`;
+        if (debug) {
+          console.log("request = " + request);
+        }
         document.getElementById('loading').textContent = 'Caricando...';
-        console.log("request = " + pquery);
-        fetch(debug ? debug_progress_json : pquery)
+        fetch(request)
           .then(response => {
             if (!response.ok) {
-              throw new Error('Network response was not ok');
+              throw new Error('Problema con la rete');
             }
             return response.json();
           })
@@ -292,7 +294,7 @@
           .catch(error => {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'block';
-            document.getElementById('error').textContent = `Error loading data: ${error.message}`;
+            document.getElementById('error').textContent = `Errore caricando dati: ${error.message}`;
           });
       } else {
         if (chartInstance != null) {
@@ -348,7 +350,7 @@
       return `${minutes.toString().padStart(2, '0')} '${seconds.toString().padStart(2, '0')}''${remainingHundredths.toString().padStart(2, '0')}`;
     }
     function createChart(cats, swimmers, legend, gara) {
-    const ctx = document.getElementById('raceChart').getContext('2d');
+      const ctx = document.getElementById('raceChart').getContext('2d');
 
       let datasets = [];
       let chartTitle = gara + ' vasca ' + (vasca == 0 ? '25m' : '50m');
