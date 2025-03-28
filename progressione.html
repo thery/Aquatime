@@ -276,6 +276,7 @@
         const pquery = `${progress_script}?id_atl1="${athlete1}"&id_atl2="${athlete2}"&id_gara="${raceSelect.value}"&Vasca="${vasca}"`;
         outputDiv.innerHTML = debug ? ` <p> ${pquery} </p>` : '';
         document.getElementById('loading').textContent = 'Caricando...';
+        console.log("request = " + pquery);
         fetch(debug ? debug_progress_json : pquery)
           .then(response => {
             if (!response.ok) {
