@@ -141,7 +141,7 @@
 
 
   <script>
-    var debug = true;
+    var debug = false;
     var search_script = 'https://aquatime.it/APILT/serch.php';
     var progress_script = 'https://aquatime.it/APILT/progress.php';
     var debug_search_json = 'search.json';
@@ -215,7 +215,7 @@
 
       try {
         console.log('request = ' + `${search_script}?AtletaSRC="${query}"`);
-        const response = await axios.get(debug ? debug_search_json : `${search_script}?AtletaSRC="${query}"`, { responseType: "json" });
+        const response = await axios.get(debug ? debug_search_json : `${search_script}?AtletaSRC=${query}`, { responseType: "json" });
         var athletes = response.data;
         if (debug) {
           athletes = athletes.filter((athlete) => athlete.name.toUpperCase().includes(query.toUpperCase()));
@@ -273,7 +273,7 @@
         const raceName = eventNames[raceSelect.value];
 
         const outputDiv = document.getElementById('output');
-        const pquery = `${progress_script}?id_atl1="${athlete1}"&id_atl2="${athlete2}"&id_gara="${raceSelect.value}"&Vasca="${vasca}"`;
+        const pquery = `${progress_script}?id_atl1=${athlete1}&id_atl2=${athlete2}&id_gara=${raceSelect.value}&Vasca=${vasca}`;
         outputDiv.innerHTML = debug ? ` <p> ${pquery} </p>` : '';
         document.getElementById('loading').textContent = 'Caricando...';
         console.log("request = " + pquery);
