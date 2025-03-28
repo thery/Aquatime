@@ -214,6 +214,7 @@
       }
 
       try {
+        console.log('request = ' + `${search_script}?AtletaSRC="${query}"`);
         const response = await axios.get(debug ? debug_search_json : `${search_script}?AtletaSRC="${query}"`, { responseType: "json" });
         var athletes = response.data;
         if (debug) {
