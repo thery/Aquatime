@@ -139,13 +139,13 @@ foo = json;
 
       let datasets = [];
       let chartTitle = '';
-      let yAxisLabel = 'partecipanti';
+      let yAxisLabel = 'Atleti';
 
       for (let i = 0; i < legends.length; i++) {
         datasets.push({
           label: legends[i],
           data: regione[i],
-          hidden: 3 < i,
+          hidden: 7 < i,
           borderColor: colors[i],
           backgroundColor: colors[i] + '33', // Add transparency
           fill: false,
