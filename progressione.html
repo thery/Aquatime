@@ -13,7 +13,7 @@
     }
 
     .chart-container {
-      width: 80%;
+      width: 100%;
       margin: 0 auto;
     }
 
@@ -218,7 +218,7 @@
         }
         const response = await axios.get(request, { responseType: "json" });
         var athletes = response.data;
-        if (athletes[0] = "Non Disponibile") {
+        if (athletes[0] == "Non Disponibile") {
           resultsDiv.innerHTML = 'Nessuna Risposta';
         } else {
           resultsDiv.innerHTML += athletes.map(athlete =>
