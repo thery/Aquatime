@@ -220,6 +220,7 @@
         if (athletes[0].name == "Non Disponibile") {
           resultsDiv.innerHTML = 'Nessuna Risposta';
         } else {
+          resultsDiv.innerHTML = '';
           resultsDiv.innerHTML += athletes.map(athlete =>
             `<div onclick="selectAthlete(${JSON.stringify(athlete).replace(/"/g, '&quot;')}, ${athlete.id_athlete}, ${athleteIndex})">
                        ${athlete.name} (${athlete.team}, ${athlete.year})
