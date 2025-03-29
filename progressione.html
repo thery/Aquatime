@@ -204,7 +204,6 @@
       vasca = val;
       checkSelections();
     }
-
     async function searchAthletes(query, resultsDiv, athleteIndex) {
       if (query.length < 2) {
         resultsDiv.innerHTML = '';
@@ -218,7 +217,7 @@
         }
         const response = await axios.get(request, { responseType: "json" });
         var athletes = response.data;
-        if (athletes[0] == "Non Disponibile") {
+        if (athletes[0].name == "Non Disponibile") {
           resultsDiv.innerHTML = 'Nessuna Risposta';
         } else {
           resultsDiv.innerHTML += athletes.map(athlete =>
