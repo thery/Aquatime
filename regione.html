@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Participazioni ai criteria</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    body {
+      margin: 20px;
+      background-color: white
+    }
+
+    .chart-container {
+      width: 80%;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: #69f;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: #69f;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Participazioni ai criteria</h1>
+
+
+  <div class="chart-container">
+    <canvas id="regionChart"></canvas>
+  </div>
+
+
+  <script>
+    const syear = 2009;
+    const regioni =
+    {
+      "Piemonte - Valle d'Aosta": 2,
+      'Liguria': 3,
+      'Trentino - Alto Adige': 9,
+      'Lombardia': 4,
+      'Veneto': 6,
+      'Friuli Venezia Giulia': 7,
+      'Emilia-Romagna': 9,
+      'Toscana': 10,
+      'Marche': 11,
+      'Umbria': 12,
+      'Lazio': 13,
+      'Abruzzo': 14,
+      'Molise': 15,
+      'Campania': 16,
+      'Puglia': 17,
+      'Basilicata': 18,
+      'Calabria': 19,
+      'Sardegna': 20,
+      'Sicilia': 21
+    };
+
+    // Default Colors
+    const colors = [
+      "#FF0000", // Red
+      "#00FF00", // Green
+      "#0000FF", // Blue
+      "#FFFF00", // Yellow
+      "#FF00FF", // Magenta
+      "#00FFFF", // Cyan
+      "#FFA500", // Orange
+      "#800080", // Purple
+      "#008000", // Dark Green
+      "#A52A2A", // Brown
+      "#FFB6C1", // Light Pink
+      "#808080", // Gray
+      "#4B0082", // Indigo
+      "#FF4500", // Orange Red
+      "#2E8B57", // Sea Green
+      "#9932CC", // Dark Orchid
+      "#8B4513", // Saddle Brown
+      "#1E90FF", // Dodger Blue
+      "#FF8C00"  // Dark Orange
+    ];
+
+    var chartInstance = null;
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('regione.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Problema con la rete');
+          }
+          return response.json();
+        })
+        .then(data => {
+          showRegione(data[0]);
+        })
+        .catch(error => {
+          console.log(error);
+        }
+        );
+    });
+
+    function getKeyByValue(object, value) {
+      return Object.keys(object).find(key => object[key] === value);
+    }
+
+    // Process the data for Chart.js
+    function showRegione(json) {
+
+      console.log(json);
+      const regione = {};
+      const legends = [];
+      const years = [];
+      const v = json.data[0][0].split(",").length - 1;
+      for (let k = 0; k < v; k++) {
+        years.push(syear + k);
+      }
+      // Process 
+      for (let i = 0; i < json.data.length; i++) {
+        const entry = json.data[i][0].split(",");
+        regione[i] = [];
+        legends.push(getKeyByValue(regioni, parseInt(entry[0])));
+        for (let j = 1; j < entry.length; j++) {
+          regione[i].push(entry[j]);
+        }
+      }
+      const ctx = document.getElementById('regionChart').getContext('2d');
+
+      let datasets = [];
+      let chartTitle = '';
+      let yAxisLabel = 'Participanti';
+
+      for (let i = 0; i < legends.length; i++) {
+        datasets.push({
+          label: legends[i],
+          data: regione[i],
+          hidden: 3 < i,
+          borderColor: colors[i],
+          backgroundColor: colors[i] + '33', // Add transparency
+          fill: false,
+          tension: 0.1
+        });
+      }
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: years,
+          datasets: datasets
+        },
+        options: {
+          spanGaps: true,
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: chartTitle,
+              font: {
+                size: 18
+              }
+            },
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += context.parsed.y;
+                  }
+                  return label;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Anno'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: yAxisLabel
+              },
+              ticks: {
+                callback: function (value) {
+                  return value;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+  </script>
+</body>
+
+</html>
