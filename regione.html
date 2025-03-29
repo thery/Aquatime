@@ -91,7 +91,7 @@
 
     var chartInstance = null;
     document.addEventListener('DOMContentLoaded', function () {
-      fetch('regione.json')
+      fetch('api_regioni_all.php.json')
         .then(response => {
           if (!response.ok) {
             throw new Error('Problema con la rete');
@@ -110,10 +110,10 @@
     function getKeyByValue(object, value) {
       return Object.keys(object).find(key => object[key] === value);
     }
-
+var foo;
     // Process the data for Chart.js
     function showRegione(json) {
-
+foo = json;
       console.log(json);
       const regione = {};
       const legends = [];
@@ -123,12 +123,16 @@
         years.push(syear + k);
       }
       // Process 
-      for (let i = 0; i < json.data.length; i++) {
-        const entry = json.data[i][0].split(",");
+      for (let i = 0; i < json.data[0].length; i++) {
+        const entry = json.data[0][i].split(",");
         regione[i] = [];
         legends.push(getKeyByValue(regioni, parseInt(entry[0])));
         for (let j = 1; j < entry.length; j++) {
-          regione[i].push(entry[j]);
+          if ((11 < j) && (j < 14)) {
+            regione[i].push(null);
+          } else {
+            regione[i].push(entry[j]);
+          }
         }
       }
       const ctx = document.getElementById('regionChart').getContext('2d');
