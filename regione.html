@@ -13,7 +13,7 @@
     }
 
     .chart-container {
-      width: 80%;
+      width: 100%;
       margin: 0 auto;
     }
 
@@ -64,6 +64,28 @@
       'Calabria': 19,
       'Sardegna': 20,
       'Sicilia': 21
+    };
+    const regioni1 =
+    {
+      "PIE": 2,
+      'LIG': 3,
+      'TRE': 5,
+      'LOM': 4,
+      'VEN': 6,
+      'FRI': 7,
+      'EMI': 9,
+      'TOS': 10,
+      'MAR': 11,
+      'UMB': 12,
+      'LAZ': 13,
+      'ABR': 14,
+      'MOL': 15,
+      'CAM': 16,
+      'PUG': 17,
+      'BAS': 18,
+      'CAL': 19,
+      'SAR': 20,
+      'SiC': 21
     };
 
     // Default Colors
@@ -126,7 +148,7 @@ foo = json;
       for (let i = 0; i < json.data[0].length; i++) {
         const entry = json.data[0][i].split(",");
         regione[i] = [];
-        legends.push(getKeyByValue(regioni, parseInt(entry[0])));
+        legends.push(getKeyByValue(regioni1, parseInt(entry[0])));
         for (let j = 1; j < entry.length; j++) {
           if ((11 < j) && (j < 14)) {
             regione[i].push(null);
@@ -171,11 +193,17 @@ foo = json;
               display: true,
               text: chartTitle,
               font: {
-                size: 18
+                size: 12
               }
             },
             legend: {
-              position: 'bottom'
+              position: 'bottom',
+              labels : {
+                boxWidth : 16,
+                font: {
+                size: 10
+              }
+              }
             },
             tooltip: {
               callbacks: {
