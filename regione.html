@@ -132,10 +132,10 @@
     function getKeyByValue(object, value) {
       return Object.keys(object).find(key => object[key] === value);
     }
-var foo;
+    var foo;
     // Process the data for Chart.js
     function showRegione(json) {
-foo = json;
+      foo = json;
       console.log(json);
       const regione = {};
       const legends = [];
@@ -198,17 +198,17 @@ foo = json;
             },
             legend: {
               position: 'bottom',
-              labels : {
-                boxWidth : 16,
+              labels: {
+                boxWidth: 16,
                 font: {
-                size: 10
-              }
+                  size: 10
+                }
               }
             },
             tooltip: {
               callbacks: {
                 label: function (context) {
-                  let label = getKeyByValue(regioni,regioni1[context.dataset.label]) || '';
+                  let label = getKeyByValue(regioni, regioni1[context.dataset.label]) || '';
                   if (label) {
                     label += ': ';
                   }
