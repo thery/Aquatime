@@ -208,7 +208,7 @@ foo = json;
             tooltip: {
               callbacks: {
                 label: function (context) {
-                  let label = context.dataset.label || '';
+                  let label = getKeyByValue(regioni,regioni1[context.dataset.label]) || '';
                   if (label) {
                     label += ': ';
                   }
