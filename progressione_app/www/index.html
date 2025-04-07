@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Progressione</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: content: https://ssl.gstatic.com">
+  
+  <!-- Chart.js and Axios from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  
+  <!-- Add Capacitor for native functionality -->
+  <script src="https://unpkg.com/@capacitor/core@latest/dist/capacitor.js"></script>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <h1>Progressione</h1>
+
+  <div class="search-container">
+    <div class="search-box">
+      <h2>Primo Atleta</h2>
+      <input class="search" type="text" id="search1" placeholder="Inserire il nome">
+      <div class="result" id="results1"></div>
+      <div id="selected1"></div>
+    </div>
+
+    <div class="search-box">
+      <h2>Secondo Atleta</h2>
+      <input class="search" type="text" id="search2" placeholder="Inserire il nome">
+      <div class="result" id="results2"></div>
+      <div id="selected2"></div>
+    </div>
+  </div>
+
+  <div>
+    <h2 style="text-align: left">Gara</h2>
+    <div>
+      <label><input onclick='handleVasca(0);' type="radio" name="vasca" value="0" checked>25m</label>
+      <label><input onclick='handleVasca(1);' type="radio" name="vasca" value="1">50m</label>
+    </div>
+    <br>
+    <select class="search" id="raceSelect">
+      <option value="">Seleziona una gara</option>
+      <option value="36">50 stile</option>
+      <option value="32">100 stile</option>
+      <option value="40">200 stile</option>
+      <option value="47">400 stile</option>
+      <option value="48">800 stile</option>
+      <option value="49">1500 stile</option>
+      <option value="37">50 dorso</option>
+      <option value="33">100 dorso</option>
+      <option value="41">200 dorso</option>
+      <option value="38">50 rana</option>
+      <option value="35">100 rana</option>
+      <option value="43">200 rana</option>
+      <option value="39">50 farfalla</option>
+      <option value="34">100 farfalla</option>
+      <option value="42">200 farfalla</option>
+      <option value="44">100 misti</option>
+      <option value="45">200 misti</option>
+      <option value="46">400 misti</option>
+    </select>
+  </div>
+  <p></p>
+
+  <div id="output"></div>
+
+  <div id="loading" class="loading"></div>
+  <div id="error" class="error" style="display:none;"></div>
+  <div id="content" style="display:none;"></div>
+  <div class="chart-container">
+    <canvas id="raceChart"></canvas>
+  </div>
+
+  <!-- Your app.js file -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

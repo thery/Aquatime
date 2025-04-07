@@ -1,0 +1,113 @@
+body {
+  margin: 20px;
+  background-color: white;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.chart-container {
+  width: 100%;
+  margin: 0 auto;
+  height: 80vh;
+}
+
+h1 {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  color: #69f;
+  margin-bottom: 30px;
+}
+
+h2 {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  color: #69f;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  font-size: 18px;
+}
+
+.error {
+  color: red;
+  padding: 15px;
+  background-color: #ffeeee;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .search-container {
+    flex-direction: row;
+  }
+}
+
+.search-box {
+  flex: 1;
+}
+
+.search {
+  font-family: Arial, sans-serif;
+  font-size: 1.2em;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.result {
+  font-family: Arial, sans-serif;
+  font-size: 1.2em;
+}
+
+#results1,
+#results2 {
+  border: 1px solid #ddd;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#results1 div,
+#results2 div {
+  padding: 8px;
+  cursor: pointer;
+}
+
+#results1 div:hover,
+#results2 div:hover {
+  background-color: #f0f0f0;
+}
+
+.selected-athlete {
+  font-family: Arial, sans-serif;
+  font-size: 1.2em;
+  background-color: #bfd3df;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+}
+
+select, input[type="radio"] {
+  margin: 5px;
+}
+
+button {
+  background-color: #69f;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #58e;
+}
