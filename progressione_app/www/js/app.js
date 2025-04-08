@@ -1,37 +1,39 @@
-import { StatusBar } from '@capacitor/status-bar';
-import { Network } from '@capacitor/network';
-
 
 // Wait for the device to be ready
 document.addEventListener('DOMContentLoaded', onDeviceReady, false);
 
 // Capacitor initialization function
 function onDeviceReady() {
-    // At the beginning of your onDeviceReady function:
-    try {
-        StatusBar.setBackgroundColor({ color: '#6699ff' });
-    } catch (err) {
-        console.error('Error setting status bar color:', err);
+    if (window.Capacitor) {
+        const { StatusBar } = Capacitor.Plugins;
+        try {
+            StatusBar.setBackgroundColor({ color: '#6699ff' });
+        } catch (err) {
+            console.error('Error setting status bar color:', err);
+        }
     }
+
     console.log('Progressione app is ready!');
     initializeApp();
-    // In your onDeviceReady function:
-    Network.addListener('networkStatusChange', status => {
-        if (!status.connected) {
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('error').textContent = 'Nessuna connessione Internet';
-        } else {
-            document.getElementById('error').style.display = 'none';
-        }
-    });
+    if (window.Capacitor) {
+        const { Network } = Capacitor.Plugins;
+        Network.addListener('networkStatusChange', status => {
+            if (!status.connected) {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Nessuna connessione Internet';
+            } else {
+                document.getElementById('error').style.display = 'none';
+            }
+        });
+        // Check initial network status
+        Network.getStatus().then(status => {
+            if (!status.connected) {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Nessuna connessione Internet';
+            }
+        });
+    }
 
-    // Check initial network status
-    Network.getStatus().then(status => {
-        if (!status.connected) {
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('error').textContent = 'Nessuna connessione Internet';
-        }
-    });
 }
 
 function initializeApp() {
