@@ -11,12 +11,12 @@
   "description": "",
   "dependencies": {
     "@capacitor/android": "^7.2.0",
+    "@capacitor/assets": "file:../../../../../tmp/assets-3.0.6.tgz",
     "@capacitor/cli": "^7.2.0",
     "@capacitor/core": "^7.2.0",
     "@capacitor/ios": "^7.2.0",
     "@capacitor/network": "^7.0.1",
     "@capacitor/status-bar": "^7.0.1",
-    "libvips": "^0.0.2",
     "sharp": "^0.34.1"
   }
 }

@@ -39,8 +39,8 @@ function onDeviceReady() {
 function initializeApp() {
     var debug = false;
     // Update to use relative paths or full URLs to your backend
-    var search_script = 'https://www.aquatime.it/APILT/serch.php';
-    var progress_script = 'https://www.aquatime.it/APILT/progress.php';
+    var search_script = 'https://www-sop.inria.fr/marelle/Laurent.Thery/test.php';
+    var progress_script = 'https://www-sop.inria.fr/marelle/Laurent.Thery/prog.php';
 
     // Create a mapping of event IDs to event names
     const eventNames = {
