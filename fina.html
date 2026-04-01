@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criteri Giovanili 2026 – Punteggi FINA</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 1200px; margin: 0 auto; }
+        h1 { color: #0066cc; text-align: center; margin-bottom: 30px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; position: sticky; top: 0; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .search-container { margin-bottom: 20px; }
+        #searchInput { padding: 8px; width: 300px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px; }
+        .loading { text-align: center; padding: 30px; font-size: 18px; }
+        .error { color: red; padding: 15px; background-color: #ffeeee; border-radius: 5px; text-align: center; }
+        .summary { margin-bottom: 20px; background-color: #f0f8ff; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Criteri Nazionali Giovanili 2026 – Miglior Punteggio FINA</h1>
+    <div id="loading" class="loading">Caricamento dati...</div>
+    <div id="error" class="error" style="display:none;"></div>
+
+    <div id="content" style="display:none;">
+        <div class="summary" id="summary"></div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Cerca Atleta">
+        </div>
+
+        <table id="finaTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Società</th>
+                    <th>Anno</th>
+                    <th>Sesso</th>
+                    <th>Categoria</th>
+                    <th>Pt. FINA</th>
+                </tr>
+            </thead>
+            <tbody id="finaList"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const CATEGORY_NAMES = {
+            "44": "Assoluti",
+            "45": "Juniores",
+            "46": "Allievi",
+            "47": "Ragazzi",
+            "48": "Esordienti A",
+            "49": "Esordienti B"
+        };
+
+        function catLabel(id) {
+            return CATEGORY_NAMES[id] || `Cat. ${id}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('api_criteriafina26_all.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('content').style.display = 'block';
+                    processFinaData(data);
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').textContent = `Errore caricamento dati: ${error.message}`;
+                });
+        });
+
+        function processFinaData(data) {
+            // Keep only the best FINA score per athlete
+            const best = {};
+            data.forEach(entry => {
+                const id = entry.idatleta;
+                const score = parseInt(entry.ptfina, 10) || 0;
+                if (!best[id] || score > best[id].score) {
+                    best[id] = {
+                        idathlete: id,
+                        name: entry.name,
+                        club: entry.club,
+                        sex: entry.sesso,
+                        age: entry.age,
+                        idcategory: entry.idcategoria,
+                        score: score
+                    };
+                }
+            });
+
+            const athleteArray = Object.values(best);
+
+            // Sort by best FINA score descending
+            athleteArray.sort((a, b) => b.score - a.score);
+
+            // Summary
+            const totalAthletes = athleteArray.length;
+            const totalEntries = data.length;
+            const topScore = athleteArray[0] ? athleteArray[0].score : 0;
+            const avgScore = totalAthletes ? Math.round(athleteArray.reduce((s, a) => s + a.score, 0) / totalAthletes) : 0;
+
+            document.getElementById('summary').innerHTML = `
+                <strong>Atleti:</strong> ${totalAthletes} |
+                <strong>Risultati totali:</strong> ${totalEntries} |
+                <strong>Punteggio massimo:</strong> ${topScore} |
+                <strong>Media punteggi:</strong> ${avgScore}
+            `;
+
+            // Render rows
+            const finaList = document.getElementById('finaList');
+            athleteArray.forEach(athlete => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="https://aquatime.it/tempi.php?Atleta=${athlete.idathlete}&Azione=2" target="_blank">${athlete.name}</a></td>
+                    <td>${athlete.club}</td>
+                    <td>${athlete.age}</td>
+                    <td>${athlete.sex}</td>
+                    <td>${catLabel(athlete.idcategory)}</td>
+                    <td><strong>${athlete.score}</strong></td>
+                `;
+                finaList.appendChild(row);
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('keyup', function() {
+                const searchValue = this.value.toLowerCase();
+                const rows = finaList.getElementsByTagName('tr');
+                for (let i = 0; i < rows.length; i++) {
+                    const rowText = rows[i].textContent.toLowerCase();
+                    rows[i].style.display = rowText.includes(searchValue) ? '' : 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
